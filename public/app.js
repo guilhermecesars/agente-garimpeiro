@@ -13,11 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let modoAuth = 'cadastro';
 
     function mostrarGate() {
-        authGate.hidden = false;
+        authGate.style.display = 'flex';
     }
 
     function esconderGate() {
-        authGate.hidden = true;
+        authGate.style.display = 'none';
     }
 
     function setModoAuth(modo) {
