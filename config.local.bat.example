@@ -1,0 +1,4 @@
+@echo off
+REM Copie este arquivo para "config.local.bat" e preencha sua chave real.
+REM O config.local.bat fica fora do git (veja .gitignore) e nunca deve ser commitado.
+set RAPIDAPI_KEY=sua_chave_aqui

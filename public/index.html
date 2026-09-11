@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garimpeiro 6.0 - Pesquisa Refinada</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+    <style>
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+        .search-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .input-field, .select-filter {
+            background: #0f172a;
+            color: #fff;
+            border: 1px solid #475569;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+        .input-field:focus, .select-filter:focus {
+            border-color: #3b82f6;
+        }
+        .input-price {
+            width: 110px;
+        }
+        .btn-search {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-search:hover {
+            background: #2563eb;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        .btn-page {
+            background: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-page:hover:not(:disabled) {
+            background: #3b82f6;
+        }
+        .btn-page:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .auth-gate {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 20px;
+        }
+        .auth-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 28px;
+            width: 100%;
+            max-width: 380px;
+        }
+        .auth-card h2 {
+            font-size: 20px;
+            color: #f8fafc;
+            margin: 12px 0 6px;
+        }
+        .auth-note {
+            font-size: 12px;
+            color: #f59e0b;
+            margin-bottom: 16px;
+        }
+        .auth-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .auth-tab {
+            flex: 1;
+            background: #0f172a;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .auth-tab.active {
+            color: #ffffff;
+            border-color: #3b82f6;
+            background: #1d4ed8;
+        }
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .auth-form .input-field {
+            width: 100%;
+        }
+        .auth-erro {
+            color: #ef4444;
+            font-size: 13px;
+            margin-top: 10px;
+            min-height: 16px;
+        }
+        .auth-status {
+            color: #10b981;
+            font-size: 13px;
+            margin-top: 4px;
+            min-height: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="authGate" class="auth-gate">
+        <div class="auth-card">
+            <div class="badge">🐉 Garimpeiro 6.0</div>
+            <h2>Acesso à ferramenta</h2>
+            <p class="auth-note">💳 Pagamento simulado — case de portfólio, nenhum valor é cobrado de verdade.</p>
+
+            <div class="auth-tabs">
+                <button type="button" id="tabCadastro" class="auth-tab active">Criar conta e assinar</button>
+                <button type="button" id="tabLogin" class="auth-tab">Já tenho conta</button>
+            </div>
+
+            <form id="formAuth" class="auth-form">
+                <input type="email" id="authEmail" class="input-field" placeholder="seu@email.com" required>
+                <input type="password" id="authSenha" class="input-field" placeholder="Senha (mín. 4 caracteres)" required minlength="4">
+                <button type="submit" id="btnAuthSubmit" class="btn-search">Criar conta e assinar (simulado)</button>
+            </form>
+
+            <p id="authErro" class="auth-erro"></p>
+            <p id="authStatus" class="auth-status"></p>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div class="badge">🐉 Taobao & 1688 China Domestic Radar</div>
+                <button onclick="localStorage.removeItem('garimpo_token'); location.reload();" style="background: transparent; border: 1px solid #475569; color: #94a3b8; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;">🔑 Trocar Chave</button>
+            </div>
+            <h1>Agente Garimpeiro 6.0</h1>
+            <p>Filtros avançados para busca refinada no mercado interno chinês</p>
+            
+            <div class="search-container">
+                <div class="search-row">
+                    <input type="text" id="searchInput" class="input-field" style="flex: 1; min-width: 250px;" placeholder="Digite o produto ou palavra-chave (ex: fone bluetooth, smartwatch)..." value="eletrônicos">
+                    <button id="btnSearch" class="btn-search">🔎 Refinar & Garimpar</button>
+                </div>
+                
+                <div class="search-row">
+                    <select id="selectVolume" class="select-filter">
+                        <option value="0">Qualquer Volume</option>
+                        <option value="10000">+10.000 Vendas</option>
+                        <option value="50000">+50.000 Vendas</option>
+                        <option value="100000">+100.000 Vendas</option>
+                    </select>
+
+                    <input type="number" id="inputMinPrice" class="input-field input-price" placeholder="Min $ USD" step="0.5">
+                    <input type="number" id="inputMaxPrice" class="input-field input-price" placeholder="Max $ USD" step="0.5">
+
+                    <select id="selectSort" class="select-filter">
+                        <option value="sales_desc">🔥 Mais Vendidos Primeiro</option>
+                        <option value="price_asc">💵 Menor Preço ($ USD)</option>
+                        <option value="price_desc">💎 Maior Preço ($ USD)</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div id="loading" class="loading-box" style="display: none; text-align: center; margin: 20px 0; color: #3b82f6;">
+                ⏳ Consultando base de dados do Taobao em Shanghai...
+            </div>
+            <div id="grid" class="grid"></div>
+
+            <div class="pagination" id="pagination" style="display: none;">
+                <button id="btnPrev" class="btn-page" disabled>◀ Anterior</button>
+                <span id="pageIndicator" style="color: #94a3b8; font-weight: 600;">Página 1</span>
+                <button id="btnNext" class="btn-page">Próxima ▶</button>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
