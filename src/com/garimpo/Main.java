@@ -86,8 +86,12 @@ public class Main {
             String path = exchange.getRequestURI().getPath();
             if (path.equals("/")) path = "/index.html";
 
-            File file = new File("public" + path);
-            if (!file.exists()) {
+            // Resolve o arquivo dentro de public/ e bloqueia path traversal
+            // (ex.: "/../../etc/passwd"): o caminho final precisa continuar
+            // sob a pasta public, senao responde 404.
+            File baseDir = new File("public").getCanonicalFile();
+            File file = new File(baseDir, path).getCanonicalFile();
+            if (!file.exists() || !file.toPath().startsWith(baseDir.toPath())) {
                 byte[] msg = "404 Not Found".getBytes();
                 exchange.sendResponseHeaders(404, msg.length);
                 exchange.getResponseBody().write(msg);
